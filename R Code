@@ -1,0 +1,202 @@
+#########################################################################################################
+Price Sensitivity Analysis
+#########################################################################################################
+
+
+#Import the data
+library(readxl)
+SKUchanges <- read_excel("R/MarginalSKUchanges.xlsx", 
+                         na = "0")
+View(SKUchanges)
+
+#Dataframe
+SKUchgDF <- data.frame(SKUchanges$SKU, SKUchanges$`change in price`, SKUchanges$`change in qty`, SKUchanges$`price sensitivity`, SKUchanges$MONTH)
+
+#Check the header and variables
+head(SKUchgDF)
+
+#########################################################################################################
+
+
+#Visualize the data
+
+plot(SKUchanges[,-c(1,4)])
+boxplot(split(SKUchanges$`change in price`, SKUchanges$MONTH),main= 'Price Change Distribution by Month')
+boxplot(split(SKUchanges$`change in qty`, SKUchanges$MONTH),main= 'Quantity Change Distribution by Month')
+boxplot(split(SKUchanges$`price sensitivity`, SKUchanges$MONTH), main= 'Price Sensitivity Distribution by Month')
+with(SKUchanges,plot(SKUchanges$`change in price`, SKUchanges$`change in qty`))
+
+
+#########################################################################################################
+
+#Analyze the Data - All SKUs
+
+
+##Linear Models for Seasonality
+
+##Qty Delta
+QtyDeltaLinearModelAllSKUs <- lm(SKUchanges$`change in qty`~ SKUchanges$MONTH, data = SKUchanges)
+summary (QtyDeltaLinearModelAllSKUs)
+
+##Price Delta
+PriceDeltaLinearModelAllSKUs <- lm(SKUchanges$`change in price`~ SKUchanges$MONTH, data = SKUchanges)
+summary (PriceDeltaLinearModelAllSKUs)
+
+##Price Sensitivity Delta
+PriceSensitivityLinearModelAllSKUs <- lm(SKUchanges$`price sensitivity`~ SKUchanges$MONTH, data = SKUchanges)
+summary (PriceSensitivityLinearModelAllSKUs)
+
+
+
+##Logistic Models for Seasonality
+
+##Qty Delta
+QtyDeltaLogisticModelAllSKUs <- glm(SKUchanges$`change in qty`~ SKUchanges$MONTH, data = SKUchanges)
+summary (QtyDeltaLogisticModelAllSKUs)
+
+##Price Delta
+PriceDeltaLogisticModelAllSKUs <- glm(SKUchanges$`change in price`~ SKUchanges$MONTH, data = SKUchanges)
+summary (PriceDeltaLogisticModelAllSKUs)
+
+##Price Sensitivity Delta
+PriceSensitivityLogisticModelAllSKUs <- glm(SKUchanges$`price sensitivity`~ SKUchanges$MONTH, data = SKUchanges)
+summary (PriceSensitivityLogisticModelAllSKUs)
+
+
+#########################################################################################################
+
+#Examine the data with Negative Price Sensitivity
+
+
+##Create data subset with only Negative Price Sensitivity
+library(dplyr)
+NPSdata <- SKUchanges %>%
+  filter(`price sensitivity` < 0)
+
+head(NPSdata)
+
+#########################################################################################################
+
+#Visualize the data
+
+plot(NPSdata[,-c(1,4)])
+boxplot(split(NPSdata$`change in price`, NPSdata$MONTH),main= 'NPS Price Change Distribution by Month')
+boxplot(split(NPSdata$`change in qty`, NPSdata$MONTH),main= 'NPS Quantity Change Distribution by Month')
+boxplot(split(NPSdata$`price sensitivity`, NPSdata$MONTH), main= 'NPS Price Sensitivity Distribution by Month')
+with(NPSdata,plot(NPSdata$`change in price`, NPSdata$`change in qty`))
+
+#########################################################################################################
+
+#Analyze the Data for Negative Price Sensitivity SKUs
+
+##Linear Models for Seasonality
+
+##Qty Delta
+QtyDeltaLinearModelNPSdata <- lm(NPSdata$`change in qty`~ NPSdata$MONTH, data = NPSdata)
+summary (QtyDeltaLinearModelNPSdata)
+
+##Price Delta
+PriceDeltaLinearModelNPSdata <- lm(NPSdata$`change in price`~ NPSdata$MONTH, data = NPSdata)
+summary (PriceDeltaLinearModelNPSdata)
+
+##Price Sensitivity Delta
+PriceSensitivityLinearModelNPSdata <- lm(NPSdata$`price sensitivity`~ NPSdata$MONTH, data = NPSdata)
+summary (PriceSensitivityLinearModelNPSdata)
+
+
+
+
+##Logistic Models for Seasonality
+
+##Qty Delta
+QtyDeltaLogisticModelNPSdata <- glm(NPSdata$`change in qty`~ NPSdata$MONTH, data = NPSdata)
+summary (QtyDeltaLogisticModelNPSdata)
+
+##Price Delta
+PriceDeltaLogisticModelNPSdata <- glm(NPSdata$`change in price`~ NPSdata$MONTH, data = NPSdata)
+summary (PriceDeltaLogisticModelNPSdata)
+
+##Price Sensitivity Delta
+PriceSensitivityLogisticModelNPSdata <- glm(NPSdata$`price sensitivity`~ NPSdata$MONTH, data = NPSdata)
+summary (PriceSensitivityLogisticModelNPSdata)
+
+
+#########################################################################################################
+
+#Examine SKUs with Negative Price Sensitivity and no Seasonal Influence
+
+##Create data subset with only Negative Price Sensitivity and no Seasonal Influence
+NPSNSdata <- SKUchanges %>%
+  filter(`price sensitivity` < 0 )
+
+NPSNSdata <- NPSNSdata %>%
+  filter(`MONTH` != "JUN") 
+
+##NPSNSdata <- NPSNSdata %>%
+  ##filter(`MONTH` != "FEB") 
+
+##NPSNSdata <- NPSNSdata %>%
+  ##filter(`MONTH` != "MAR") 
+
+##NPSNSdata <- NPSNSdata %>%
+  ##filter(`MONTH` != "JUL") 
+
+head(NPSNSdata)
+
+#########################################################################################################
+
+#Visualize the data
+
+plot(NPSNSdata[,-c(1,4)])
+boxplot(split(NPSNSdata$`change in price`, NPSNSdata$MONTH),main= 'NPSNS Price Change Distribution by Month')
+boxplot(split(NPSNSdata$`change in qty`, NPSNSdata$MONTH),main= 'NPSNS Quantity Change Distribution by Month')
+boxplot(split(NPSNSdata$`price sensitivity`, NPSNSdata$MONTH), main= 'NPSNS Price Sensitivity Distribution by Month')
+with(NPSNSdata,plot(NPSNSdata$`change in price`, NPSNSdata$`change in qty`))
+
+
+#########################################################################################################
+
+#Analyze the Data for Negative Price Sensitivity SKUs and no Seasonal Influence
+
+##Linear Models for Seasonality
+
+##Qty Delta
+QtyDeltaLinearModelNPSNSdata <- lm(NPSNSdata$`change in qty`~ NPSNSdata$MONTH, data = NPSNSdata)
+summary (QtyDeltaLinearModelNPSNSdata)
+
+##Price Delta
+PriceDeltaLinearModelNPSNSdata <- lm(NPSNSdata$`change in price`~ NPSNSdata$MONTH, data = NPSNSdata)
+summary (PriceDeltaLinearModelNPSNSdata)
+
+##Price Sensitivity Delta
+PriceSensitivityLinearModelNPSNSdata <- lm(NPSNSdata$`price sensitivity`~ NPSNSdata$MONTH, data = NPSNSdata)
+summary (PriceSensitivityLinearModelNPSNSdata)
+
+
+
+
+##Logistic Models for Seasonality
+
+##Qty Delta
+QtyDeltaLogisticModelNPSNSdata <- glm(NPSNSdata$`change in qty`~ NPSNSdata$MONTH, data = NPSNSdata)
+summary (QtyDeltaLogisticModelNPSNSdata)
+
+##Price Delta
+PriceDeltaLogisticModelNPSNSdata <- glm(NPSNSdata$`change in price`~ NPSNSdata$MONTH, data = NPSNSdata)
+summary (PriceDeltaLogisticModelNPSNSdata)
+
+##Price Sensitivity Delta
+PriceSensitivityLogisticModelNPSNSdata <- glm(NPSNSdata$`price sensitivity`~ NPSNSdata$MONTH, data = NPSNSdata)
+summary (PriceSensitivityLogisticModelNPSNSdata)
+
+
+#########################################################################################################
+
+#Testing the SKUs
+
+##Logistic Models for SKU Price Sensitivity
+##Adjusted for Negative PS and Seasonality
+
+##Price Sensitivity Delta
+SKUsPriceSensitivityLogisticModelNPSNSdata <- glm(NPSNSdata$`price sensitivity`~ NPSNSdata$SKU, data = NPSNSdata)
+summary (SKUsPriceSensitivityLogisticModelNPSNSdata)
